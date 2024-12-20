@@ -1,17 +1,44 @@
-# [Deep BSDE Solver](https://doi.org/10.1073/pnas.1718942115) in TensorFlow (2.0)
+# [DeepBSDE Solver](https://doi.org/10.1073/pnas.1718942115) Package in TensorFlow (2.0)
 
-## Quick Installation
+This repository is a fork of Jiequn Han's [DeepBSDE solver](https://github.com/frankhan91/DeepBSDE) implementation, which solves high-dimensional PDEs using deep learning. 
 
-For a quick installation, you can create a conda environment for Python using the following command:
+The code has been restructured to work either as an installable Python package or as a git submodule in other projects. While changes to the original code are minimal, extensive comments and docstrings have been added to enhance readability and understanding of the implementation. 
+
+
+## Installation
+
+You can install the DeepBSDE Solver in three ways:
+
+### 1. Direct Use
+
+For a quick installation, download the repository and create a conda environment using:
 
 ```bash
 conda env create -f environment.yml
 ```
 
+### 2. As a Git Submodule
+
+Add DeepBSDE as a git submodule to your project:
+
+```bash
+git submodule add https://github.com/steve-shao/DeepBSDE.git
+git submodule update --init --recursive
+```
+
+### 3. Install as a Python Package from GitHub
+
+Install DeepBSDE directly from GitHub using pip:
+
+```bash
+pip install git+https://github.com/steve-shao/DeepBSDE.git
+```
+
+
 ## Training
 
 ```
-python main.py --config_path=configs/hjb_lq_d100.json
+python -m tests.solve_equation --config_path=configs/hjb_lq_d100.json
 ```
 
 Command-line flags:
@@ -20,6 +47,15 @@ Command-line flags:
 There are seven PDEs implemented so far. See [Problems](#problems) section below.
 * `exp_name`: Name of numerical experiment, prefix of logging and output.
 * `log_dir`: Directory to write logging and output array.
+
+
+<br><br><br>
+
+---
+*Note: Everything below was copied from Jiequn Han's original GitHub repository's README.*
+
+<br><br><br>
+
 
 
 ## Problems

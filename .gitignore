@@ -1,4 +1,12 @@
-output
-logs
-.idea
-*.zip
+# .gitignore
+output/
+logs/
+build/
+dist/
+*.egg-info/
+env/
+venv/
+__pycache__/
+*.pyc
+.code-workspace
+.DS_Store
