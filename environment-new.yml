@@ -1,0 +1,11 @@
+name: deepbsde-new
+dependencies:
+  - python=3.12
+  - numpy
+  - scipy
+  - matplotlib
+  - jupyterlab
+  - pip
+  - pip:
+    - tensorflow[and-cuda]==2.18
+    - munch

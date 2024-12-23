@@ -1,3 +1,8 @@
+"""
+Implementation of the FeedForwardSubNet class for solving BSDEs using neural networks.
+This module contains the subnet architecture that processes input data for each time step.
+"""
+
 import munch
 import numpy as np
 import tensorflow as tf

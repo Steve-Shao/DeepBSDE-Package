@@ -10,3 +10,4 @@ __pycache__/
 *.pyc
 .code-workspace
 .DS_Store
+tests/*/
