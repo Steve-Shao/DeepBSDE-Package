@@ -8,4 +8,3 @@ dependencies:
   - pip
   - pip:
     - tensorflow==2.13
-    - munch

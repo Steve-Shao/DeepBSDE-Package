@@ -20,7 +20,7 @@ class HJBLQ(Equation):
         """Initialize the HJBLQ equation with given configuration.
         
         Args:
-            eqn_config: Configuration object containing PDE parameters
+            eqn_config: Configuration dictionary containing PDE parameters
         """
         super(HJBLQ, self).__init__(eqn_config)
         # Initialize model parameters
@@ -88,14 +88,13 @@ if __name__ == "__main__":
     # -------------------------------------------------------
     # Test Configuration
     # -------------------------------------------------------
-    class Config:
-        def __init__(self):
-            self.dim = 3
-            self.total_time = 1.0
-            self.num_time_interval = 100
+    config = {
+        'dim': 3,
+        'total_time': 1.0,
+        'num_time_interval': 100
+    }
 
     # Initialize equation
-    config = Config()
     equation = HJBLQ(config)
     print("\nInitialized HJBLQ equation with:")
     print(f"Dimension: {equation.dim}")

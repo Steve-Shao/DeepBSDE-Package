@@ -27,9 +27,9 @@ class Equation(object):
                 - num_time_interval: Number of time discretization steps
         """
         # Core problem dimensions and time parameters
-        self.dim = eqn_config.dim
-        self.total_time = eqn_config.total_time
-        self.num_time_interval = eqn_config.num_time_interval
+        self.dim = eqn_config['dim']
+        self.total_time = eqn_config['total_time']
+        self.num_time_interval = eqn_config['num_time_interval']
         
         # Derived time step calculations
         self.delta_t = self.total_time / self.num_time_interval
@@ -81,7 +81,6 @@ if __name__ == '__main__':
     # Setup and Configuration
     # -------------------------------------------------------
     import json
-    import munch
     
     # Set random seeds for reproducibility
     tf.random.set_seed(42)
@@ -93,7 +92,6 @@ if __name__ == '__main__':
         "total_time": 1.0,
         "num_time_interval": 20
     }''')
-    config = munch.munchify(config)
 
     # Initialize base equation
     equation = Equation(config)

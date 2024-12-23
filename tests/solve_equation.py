@@ -5,7 +5,6 @@ BSDE stands for Backward Stochastic Differential Equations, which are used to so
 
 # Standard library imports
 import json
-import munch # Munch is a Python package that converts dict to a Python class-like object with attribute-style access
 import os
 import logging
 
@@ -47,14 +46,13 @@ def main(argv):
     # Ignore command line arguments as they're handled by FLAGS
     del argv
 
-    # Load and parse configuration file
+    # Load configuration file
     with open(FLAGS.config_path) as json_data_file:
         config = json.load(json_data_file)
-    config = munch.munchify(config)  # Convert dict to object for attribute access
         
     # Initialize BSDE equation based on config
-    bsde = getattr(eqn, config.eqn_config.eqn_name)(config.eqn_config)
-    tf.keras.backend.set_floatx(config.net_config.dtype)
+    bsde = getattr(eqn, config['eqn_config']['eqn_name'])(config['eqn_config'])
+    tf.keras.backend.set_floatx(config['net_config']['dtype'])
 
     # Create log directory if it doesn't exist
     if not os.path.exists(FLAGS.log_dir):
@@ -63,16 +61,14 @@ def main(argv):
 
     # Save configuration to JSON file
     with open('{}_config.json'.format(path_prefix), 'w') as outfile:
-        json.dump(dict((name, getattr(config, name))
-                      for name in dir(config) if not name.startswith('__')),
-                 outfile, indent=2)
+        json.dump(config, outfile, indent=2)
 
     # Configure logging format and level
     absl_logging.get_absl_handler().setFormatter(logging.Formatter('%(levelname)-6s %(message)s'))
     absl_logging.set_verbosity('info')
 
     # Initialize and train BSDE solver
-    logging.info('Begin to solve %s ' % config.eqn_config.eqn_name)
+    logging.info('Begin to solve %s ' % config['eqn_config']['eqn_name'])
     bsde_solver = BSDESolver(config, bsde)
     training_history = bsde_solver.train()
 

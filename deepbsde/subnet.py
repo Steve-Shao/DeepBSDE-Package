@@ -3,7 +3,6 @@ Implementation of the FeedForwardSubNet class for solving BSDEs using neural net
 This module contains the subnet architecture that processes input data for each time step.
 """
 
-import munch
 import numpy as np
 import tensorflow as tf
 
@@ -67,7 +66,7 @@ class FeedForwardSubNet(tf.keras.Model):
         """Initialize the feed-forward sub-network.
         
         Args:
-            config (munch.Munch): Configuration object containing:
+            config (dict): Configuration dictionary containing:
                 - eqn_config.dim: The dimension of the input and final output.
                 - net_config.num_hiddens: A list defining the size of each hidden layer.
         
@@ -76,8 +75,8 @@ class FeedForwardSubNet(tf.keras.Model):
           - A list of Dense layers corresponding to hidden layers and a final Dense layer.
         """
         super(FeedForwardSubNet, self).__init__()
-        dim = config.eqn_config.dim
-        num_hiddens = config.net_config.num_hiddens
+        dim = config['eqn_config']['dim']
+        num_hiddens = config['net_config']['num_hiddens']
 
         # Create batch normalization layers:
         # We need (len(num_hiddens) + 2) BN layers in total:
@@ -136,11 +135,10 @@ if __name__ == "__main__":
     # Prepare Mock Configuration
     # -------------------------------------------------------
     # We do not alter the network structure or parameters, only the test code.
-    mock_config = munch.Munch()
-    mock_config.eqn_config = munch.Munch()
-    mock_config.net_config = munch.Munch()
-    mock_config.eqn_config.dim = 10  # dimension of input/output
-    mock_config.net_config.num_hiddens = [20, 20]  # hidden layers
+    mock_config = {
+        'eqn_config': {'dim': 10},  # dimension of input/output
+        'net_config': {'num_hiddens': [20, 20]}  # hidden layers
+    }
 
     # Initialize the network
     net = FeedForwardSubNet(mock_config)
@@ -149,7 +147,7 @@ if __name__ == "__main__":
     # Build and Summarize the Model
     # -------------------------------------------------------
     # Build the model for a known input shape so summary can be printed
-    net.build((None, mock_config.eqn_config.dim))
+    net.build((None, mock_config['eqn_config']['dim']))
     print("\nModel Structure:")
     print("---------------")
     net.summary()
@@ -190,7 +188,7 @@ if __name__ == "__main__":
     # -------------------------------------------------------
     # Create input data to test forward pass
     batch_size = 32
-    input_dim = mock_config.eqn_config.dim
+    input_dim = mock_config['eqn_config']['dim']
     test_input_data = np.tile(np.linspace(0, 1, input_dim), (batch_size, 1)).astype(np.float32)
 
     # Print input distribution

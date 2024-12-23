@@ -11,7 +11,6 @@ import json
 
 import numpy as np
 import tensorflow as tf
-import munch
 
 from . import equation as eqn
 from .model import NonsharedModel
@@ -31,8 +30,8 @@ class BSDESolver(object):
         bsde: BSDE equation object defining the problem to solve
     """
     def __init__(self, config, bsde):
-        self.eqn_config = config.eqn_config
-        self.net_config = config.net_config
+        self.eqn_config = config['eqn_config']
+        self.net_config = config['net_config']
         self.bsde = bsde
 
         # Initialize model and get reference to y_init parameter
@@ -41,7 +40,7 @@ class BSDESolver(object):
 
         # Setup learning rate schedule and Adam optimizer
         lr_schedule = tf.keras.optimizers.schedules.PiecewiseConstantDecay(
-            self.net_config.lr_boundaries, self.net_config.lr_values)
+            self.net_config['lr_boundaries'], self.net_config['lr_values'])
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule, epsilon=1e-8)
 
     def train(self):
@@ -55,20 +54,20 @@ class BSDESolver(object):
         """
         start_time = time.time()
         training_history = []
-        valid_data = self.bsde.sample(self.net_config.valid_size)
+        valid_data = self.bsde.sample(self.net_config['valid_size'])
 
         # Main training loop
-        for step in range(self.net_config.num_iterations+1):
+        for step in range(self.net_config['num_iterations']+1):
             # Log progress at specified frequency
-            if step % self.net_config.logging_frequency == 0:
+            if step % self.net_config['logging_frequency'] == 0:
                 loss = self.loss_fn(valid_data, training=False).numpy()
                 y_init = self.y_init.numpy()[0]
                 elapsed_time = time.time() - start_time
                 training_history.append([step, loss, y_init, elapsed_time])
-                if self.net_config.verbose:
+                if self.net_config['verbose']:
                     logging.info("step: %5u,    loss: %.4e, Y0: %.4e,   elapsed time: %3u" % (
                         step, loss, y_init, elapsed_time))
-            self.train_step(self.bsde.sample(self.net_config.batch_size))
+            self.train_step(self.bsde.sample(self.net_config['batch_size']))
         return np.array(training_history)
 
     def loss_fn(self, inputs, training):
@@ -150,14 +149,13 @@ if __name__ == '__main__':
             "verbose": true
         }
     }''')
-    config = munch.munchify(config)  # Convert dict to object for attribute access
 
     # -------------------------------------------------------
     # Model Initialization
     # -------------------------------------------------------
     # Initialize BSDE equation
-    bsde = getattr(eqn, config.eqn_config.eqn_name)(config.eqn_config)
-    tf.keras.backend.set_floatx(config.net_config.dtype)
+    bsde = getattr(eqn, config['eqn_config']['eqn_name'])(config['eqn_config'])
+    tf.keras.backend.set_floatx(config['net_config']['dtype'])
 
     # Initialize and train BSDE solver
     solver = BSDESolver(config, bsde)
@@ -173,7 +171,7 @@ if __name__ == '__main__':
     
     # Test data generation
     print("\nTesting data generation...")
-    test_batch = bsde.sample(config.net_config.batch_size)
+    test_batch = bsde.sample(config['net_config']['batch_size'])
     print("Sample batch shapes - dw:", test_batch[0].shape, "x:", test_batch[1].shape)
     
     # Test forward pass

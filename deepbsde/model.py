@@ -8,7 +8,6 @@ Differential Equations).
 
 # Standard library imports
 import json
-import munch
 import logging
 import numpy as np
 import tensorflow as tf
@@ -30,17 +29,17 @@ class NonsharedModel(tf.keras.Model):
     """
     def __init__(self, config, bsde):
         super(NonsharedModel, self).__init__()
-        self.eqn_config = config.eqn_config
-        self.net_config = config.net_config
+        self.eqn_config = config['eqn_config']
+        self.net_config = config['net_config']
         self.bsde = bsde
         
         # Initialize y and z variables with random values
-        self.y_init = tf.Variable(np.random.uniform(low=self.net_config.y_init_range[0],
-                                                    high=self.net_config.y_init_range[1],
+        self.y_init = tf.Variable(np.random.uniform(low=self.net_config['y_init_range'][0],
+                                                    high=self.net_config['y_init_range'][1],
                                                     size=[1])
                                   )
         self.z_init = tf.Variable(np.random.uniform(low=-.1, high=.1,
-                                                    size=[1, self.eqn_config.dim])
+                                                    size=[1, self.eqn_config['dim']])
                                   )
 
         # Create subnet for each time step except the last one
@@ -59,8 +58,8 @@ class NonsharedModel(tf.keras.Model):
             y: Terminal value approximation
         """
         dw, x = inputs
-        time_stamp = np.arange(0, self.eqn_config.num_time_interval) * self.bsde.delta_t
-        all_one_vec = tf.ones(shape=tf.stack([tf.shape(dw)[0], 1]), dtype=self.net_config.dtype)
+        time_stamp = np.arange(0, self.eqn_config['num_time_interval']) * self.bsde.delta_t
+        all_one_vec = tf.ones(shape=tf.stack([tf.shape(dw)[0], 1]), dtype=self.net_config['dtype'])
         y = all_one_vec * self.y_init
         z = tf.matmul(all_one_vec, self.z_init)
 
@@ -108,11 +107,10 @@ if __name__ == '__main__':
             "verbose": true
         }
     }''')
-    config = munch.munchify(config)  # Convert dict to object for attribute access
         
     # Initialize BSDE equation based on config
-    bsde = getattr(eqn, config.eqn_config.eqn_name)(config.eqn_config)
-    tf.keras.backend.set_floatx(config.net_config.dtype)
+    bsde = getattr(eqn, config['eqn_config']['eqn_name'])(config['eqn_config'])
+    tf.keras.backend.set_floatx(config['net_config']['dtype'])
 
     # Initialize NonsharedModel
     model = NonsharedModel(config, bsde)
@@ -124,8 +122,8 @@ if __name__ == '__main__':
     print("------------------------")
     # Create dummy input to build the model
     batch_size = 64
-    dw = tf.zeros((batch_size, config.eqn_config.dim, config.eqn_config.num_time_interval))
-    x = tf.zeros((batch_size, config.eqn_config.dim, config.eqn_config.num_time_interval))
+    dw = tf.zeros((batch_size, config['eqn_config']['dim'], config['eqn_config']['num_time_interval']))
+    x = tf.zeros((batch_size, config['eqn_config']['dim'], config['eqn_config']['num_time_interval']))
     model((dw, x), training=False)  # Build model
     model.summary()
 
@@ -145,11 +143,11 @@ if __name__ == '__main__':
     print("\nSubnet Details and Tests:")
     print("-----------------------")
     print(f"Number of subnets: {len(model.subnet)}")
-    print(f"Y initialization range: {config.net_config.y_init_range}")
+    print(f"Y initialization range: {config['net_config']['y_init_range']}")
     print(f"Z initialization range: [-0.1, 0.1]")
     
     # Test each subnet individually
-    test_input = tf.random.normal((batch_size, config.eqn_config.dim))
+    test_input = tf.random.normal((batch_size, config['eqn_config']['dim']))
     for i, subnet in enumerate(model.subnet):
         subnet_output = subnet(test_input, training=False)
         print(f"\nSubnet {i} test:")
@@ -175,8 +173,8 @@ if __name__ == '__main__':
     print(f"Output max: {tf.reduce_max(y_zero):.6f}")
 
     # Test 2: Random normal inputs
-    dw_random = tf.random.normal((batch_size, config.eqn_config.dim, config.eqn_config.num_time_interval))
-    x_random = tf.random.normal((batch_size, config.eqn_config.dim, config.eqn_config.num_time_interval))
+    dw_random = tf.random.normal((batch_size, config['eqn_config']['dim'], config['eqn_config']['num_time_interval']))
+    x_random = tf.random.normal((batch_size, config['eqn_config']['dim'], config['eqn_config']['num_time_interval']))
     y_random = model((dw_random, x_random), training=False)
     print("\nTest with random normal inputs:")
     print(f"Output shape: {y_random.shape}")
@@ -186,8 +184,8 @@ if __name__ == '__main__':
     print(f"Output max: {tf.reduce_max(y_random):.6f}")
 
     # Test 3: Edge case with large values
-    dw_large = tf.random.normal((batch_size, config.eqn_config.dim, config.eqn_config.num_time_interval)) * 10
-    x_large = tf.random.normal((batch_size, config.eqn_config.dim, config.eqn_config.num_time_interval)) * 10
+    dw_large = tf.random.normal((batch_size, config['eqn_config']['dim'], config['eqn_config']['num_time_interval'])) * 10
+    x_large = tf.random.normal((batch_size, config['eqn_config']['dim'], config['eqn_config']['num_time_interval'])) * 10
     y_large = model((dw_large, x_large), training=False)
     print("\nTest with large inputs:")
     print(f"Output shape: {y_large.shape}")
