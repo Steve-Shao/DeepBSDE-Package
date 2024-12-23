@@ -22,7 +22,7 @@ conda env create -f environment.yml
 Add DeepBSDE as a git submodule to your project:
 
 ```bash
-git submodule add https://github.com/steve-shao/DeepBSDE.git
+git submodule add https://github.com/steve-shao/DeepBSDE-Package.git
 git submodule update --init --recursive
 ```
 
@@ -31,7 +31,7 @@ git submodule update --init --recursive
 Install DeepBSDE directly from GitHub using pip:
 
 ```bash
-pip install git+https://github.com/steve-shao/DeepBSDE.git
+pip install git+https://github.com/steve-shao/DeepBSDE-Package.git
 ```
 
 
