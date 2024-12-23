@@ -1,13 +1,13 @@
 # .gitignore
-output/
-logs/
-build/
-dist/
+*.pyc
 *.egg-info/
+*.code-workspace
+.DS_Store
 env/
 venv/
 __pycache__/
-*.pyc
-.code-workspace
-.DS_Store
+output/
+build/
+logs/
+dist/
 tests/*/
